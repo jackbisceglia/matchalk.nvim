@@ -1,158 +1,110 @@
-local M = {}
+-- theme.lua
+-- matchalk neovim colorscheme
 
-local colors = {
-	-- Base colors
+local theme = {}
+
+-- palette
+theme.colors = {
 	bg = "#273136",
-	bg_darker = "#1c2427",
 	fg = "#D1DED3",
-
-	-- Terminal colors
-	black = "#323E45",
-	blue = "#7EA4B0",
-	green = "#7eb08a",
 	red = "#ff819f",
+	green = "#7eb08a",
 	yellow = "#d2b48c",
-	purple = "#ba8eaf",
-
-	-- Additional colors
-	comment = "#7ea4b088",
-	keyword = "#d2b48c",
-	function_name = "#7eb08a",
-	string = "#ba8eaf",
+	blue = "#7ea4b0",
+	magenta = "#ba8eaf",
+	cyan = "#7ea4b0",
+	comment = "#7ea4b0",
+	gutter_fg = "#D1DED350",
+	sel_bg = "#7eb08a30",
+	menu_bg = "#323e45",
 }
 
-local function highlight(group, opts)
-	local bg = opts.bg == nil and nil or opts.bg == "NONE" and "NONE" or opts.bg
-	local fg = opts.fg == nil and nil or opts.fg == "NONE" and "NONE" or opts.fg
-	local sp = opts.sp == nil and nil or opts.sp
+-- helper
+local hl = vim.api.nvim_set_hl
 
-	local style = opts.style or "NONE"
+function theme.setup()
+	vim.cmd("highlight clear")
+	if vim.fn.exists("syntax_on") == 1 then
+		vim.cmd("syntax reset")
+	end
+	vim.g.colors_name = "matchalk"
 
-	vim.api.nvim_set_hl(0, group, {
-		bg = bg,
-		fg = fg,
-		sp = sp,
-		bold = style:find("bold") ~= nil,
-		italic = style:find("italic") ~= nil,
-		underline = style:find("underline") ~= nil,
-	})
+	local c = theme.colors
+
+	-- core UI
+	hl(0, "Normal", { fg = c.fg, bg = c.bg })
+	hl(0, "CursorLine", { bg = c.menu_bg })
+	hl(0, "CursorLineNr", { fg = c.yellow, bg = c.menu_bg, bold = true })
+
+	hl(0, "LineNr", { fg = c.gutter_fg, bg = c.bg })
+	hl(0, "Visual", { bg = c.sel_bg })
+	hl(0, "Search", { fg = c.bg, bg = c.yellow })
+	hl(0, "IncSearch", { fg = c.bg, bg = c.yellow })
+	hl(0, "Pmenu", { fg = c.fg, bg = c.menu_bg })
+	hl(0, "PmenuSel", { fg = c.bg, bg = c.yellow })
+	hl(0, "PmenuSbar", { bg = c.bg })
+	hl(0, "PmenuThumb", { bg = c.sel_bg })
+	hl(0, "StatusLine", { fg = c.fg, bg = c.bg })
+	hl(0, "StatusLineNC", { fg = c.gutter_fg, bg = c.bg })
+	hl(0, "TabLine", { fg = "#cccccc", bg = "#1c2427" })
+	hl(0, "TabLineSel", { fg = c.fg, bg = c.bg })
+	hl(0, "TabLineFill", { fg = c.fg, bg = "#1c2427" })
+	hl(0, "VertSplit", { fg = c.bg })
+
+	-- syntax
+	hl(0, "Comment", { fg = c.comment, italic = true })
+	hl(0, "Constant", { fg = c.yellow })
+	hl(0, "String", { fg = c.magenta })
+	hl(0, "Character", { fg = c.magenta })
+	hl(0, "Number", { fg = c.blue })
+	hl(0, "Boolean", { fg = c.blue })
+	hl(0, "Float", { fg = c.blue })
+	hl(0, "Identifier", { fg = c.green })
+	hl(0, "Function", { fg = c.green })
+	hl(0, "Statement", { fg = c.yellow, bold = true })
+	hl(0, "Conditional", { fg = c.yellow, bold = true })
+	hl(0, "Repeat", { fg = c.yellow, bold = true })
+	hl(0, "Label", { fg = c.yellow })
+	hl(0, "Operator", { fg = c.yellow })
+	hl(0, "Keyword", { fg = c.yellow, bold = true })
+	hl(0, "Exception", { fg = c.yellow })
+	hl(0, "PreProc", { fg = c.yellow })
+	hl(0, "Include", { fg = c.yellow })
+	hl(0, "Define", { fg = c.yellow })
+	hl(0, "Macro", { fg = c.yellow })
+	hl(0, "Type", { fg = c.blue })
+	hl(0, "StorageClass", { fg = c.blue })
+	hl(0, "Structure", { fg = c.blue })
+	hl(0, "Typedef", { fg = c.blue })
+	hl(0, "Special", { fg = c.magenta })
+	hl(0, "SpecialChar", { fg = c.yellow })
+	hl(0, "Tag", { fg = c.green })
+	hl(0, "Delimiter", { fg = c.blue })
+	hl(0, "Underlined", { fg = c.yellow, underline = true })
+	hl(0, "Ignore", { fg = c.bg })
+	hl(0, "Error", { fg = c.red, bg = c.bg })
+	hl(0, "Todo", { fg = c.bg, bg = c.yellow })
+
+	-- diagnostics (Neovim 0.6+)
+	hl(0, "DiagnosticError", { fg = c.red })
+	hl(0, "DiagnosticWarn", { fg = c.yellow })
+	hl(0, "DiagnosticInfo", { fg = c.yellow })
+	hl(0, "DiagnosticHint", { fg = c.green })
+
+	-- treesitter (optional)
+	hl(0, "@comment", { fg = c.comment, italic = true })
+	hl(0, "@constant", { fg = c.yellow })
+	hl(0, "@string", { fg = c.magenta })
+	hl(0, "@variable", { fg = c.fg })
+	hl(0, "@function", { fg = c.green })
+	hl(0, "@method", { fg = c.green })
+	hl(0, "@keyword", { fg = c.yellow, bold = true })
+	hl(0, "@type", { fg = c.blue })
+	hl(0, "@parameter", { fg = c.red })
+	hl(0, "@field", { fg = c.fg })
+	hl(0, "@property", { fg = c.fg })
+	hl(0, "@tag", { fg = c.yellow })
+	hl(0, "@punctuation", { fg = c.blue })
 end
 
-function M.setup()
-	-- Editor
-	highlight("Normal", { fg = colors.fg, bg = colors.bg })
-	highlight("NormalFloat", { fg = colors.fg, bg = colors.bg_darker })
-	highlight("SignColumn", { fg = colors.fg, bg = colors.bg })
-	highlight("EndOfBuffer", { fg = colors.bg }) -- Hide ~ characters
-	highlight("NormalNC", { fg = colors.fg, bg = colors.bg })
-	highlight("Pmenu", { fg = colors.fg, bg = colors.bg_darker })
-	highlight("PmenuSel", { fg = colors.bg_darker, bg = colors.green })
-	highlight("PmenuSbar", { bg = colors.bg_darker })
-	highlight("PmenuThumb", { bg = colors.fg })
-	highlight("Cursor", { bg = colors.fg, fg = colors.bg })
-	highlight("CursorLine", { bg = "#2C373C" })
-	highlight("CursorLineNr", { fg = colors.fg, style = "bold" })
-	highlight("LineNr", { fg = colors.comment })
-	highlight("VertSplit", { fg = colors.black, bg = colors.bg })
-	highlight("Visual", { bg = "#364046" })
-	highlight("VisualNOS", { bg = "#364046" })
-	highlight("Search", { fg = colors.bg, bg = colors.yellow })
-	highlight("IncSearch", { fg = colors.bg, bg = colors.yellow })
-	highlight("CurSearch", { fg = colors.bg, bg = colors.yellow })
-	highlight("MatchParen", { fg = colors.yellow, style = "bold" })
-	highlight("NonText", { fg = colors.comment })
-	highlight("StatusLine", { fg = colors.fg, bg = colors.bg_darker })
-	highlight("StatusLineNC", { fg = colors.comment, bg = colors.bg_darker })
-	highlight("Folded", { fg = colors.comment, bg = colors.bg_darker })
-	highlight("FoldColumn", { fg = colors.comment, bg = colors.bg })
-	highlight("Title", { fg = colors.green, style = "bold" })
-
-	-- Diagnostics
-	highlight("Error", { fg = colors.red })
-	highlight("ErrorMsg", { fg = colors.red })
-	highlight("WarningMsg", { fg = colors.yellow })
-	highlight("DiagnosticError", { fg = colors.red })
-	highlight("DiagnosticWarn", { fg = colors.yellow })
-	highlight("DiagnosticInfo", { fg = colors.blue })
-	highlight("DiagnosticHint", { fg = colors.purple })
-	highlight("DiagnosticUnderlineError", { sp = colors.red, style = "underline" })
-	highlight("DiagnosticUnderlineWarn", { sp = colors.yellow, style = "underline" })
-	highlight("DiagnosticUnderlineInfo", { sp = colors.blue, style = "underline" })
-	highlight("DiagnosticUnderlineHint", { sp = colors.purple, style = "underline" })
-
-	-- Common syntax
-	highlight("Comment", { fg = colors.comment })
-	highlight("String", { fg = colors.string })
-	highlight("Keyword", { fg = colors.keyword, style = "bold" })
-	highlight("Function", { fg = colors.function_name })
-	highlight("Identifier", { fg = colors.fg })
-	highlight("Constant", { fg = colors.purple })
-	highlight("Special", { fg = colors.blue })
-	highlight("Statement", { fg = colors.keyword, style = "bold" })
-	highlight("PreProc", { fg = colors.keyword })
-	highlight("Type", { fg = colors.green })
-	highlight("Operator", { fg = colors.yellow })
-	highlight("Todo", { fg = colors.yellow, bg = "NONE", style = "bold" })
-
-	-- Diff
-	highlight("DiffAdd", { fg = colors.green, bg = "#2A3734" })
-	highlight("DiffChange", { fg = colors.yellow, bg = "#2A3531" })
-	highlight("DiffDelete", { fg = colors.red, bg = "#2A2E34" })
-	highlight("DiffText", { fg = colors.blue, bg = "#2A3139" })
-
-	-- Git
-	highlight("GitSignsAdd", { fg = colors.green })
-	highlight("GitSignsChange", { fg = colors.yellow })
-	highlight("GitSignsDelete", { fg = colors.red })
-
-	-- LSP
-	highlight("LspReferenceText", { bg = "#364046" })
-	highlight("LspReferenceRead", { bg = "#364046" })
-	highlight("LspReferenceWrite", { bg = "#364046" })
-
-	-- Treesitter
-	highlight("@variable", { fg = colors.fg })
-	highlight("@function", { fg = colors.function_name })
-	highlight("@function.call", { fg = colors.function_name })
-	highlight("@keyword", { fg = colors.keyword, style = "bold" })
-	highlight("@keyword.function", { fg = colors.keyword, style = "bold" })
-	highlight("@keyword.operator", { fg = colors.yellow })
-	highlight("@method", { fg = colors.function_name })
-	highlight("@method.call", { fg = colors.function_name })
-	highlight("@constructor", { fg = colors.function_name })
-	highlight("@parameter", { fg = colors.fg })
-	highlight("@string", { fg = colors.string })
-	highlight("@number", { fg = colors.purple })
-	highlight("@boolean", { fg = colors.purple })
-	highlight("@field", { fg = colors.fg })
-	highlight("@property", { fg = colors.fg })
-	highlight("@comment", { fg = colors.comment })
-	highlight("@type", { fg = colors.green })
-	highlight("@constant", { fg = colors.purple })
-	highlight("@operator", { fg = colors.yellow })
-	highlight("@tag", { fg = colors.green })
-	highlight("@tag.attribute", { fg = colors.function_name })
-	highlight("@punctuation.bracket", { fg = colors.fg })
-	highlight("@punctuation.delimiter", { fg = colors.fg })
-
-	-- Terminal
-	vim.g.terminal_color_0 = colors.black
-	vim.g.terminal_color_1 = colors.red
-	vim.g.terminal_color_2 = colors.green
-	vim.g.terminal_color_3 = colors.yellow
-	vim.g.terminal_color_4 = colors.blue
-	vim.g.terminal_color_5 = colors.purple
-	vim.g.terminal_color_6 = colors.blue
-	vim.g.terminal_color_7 = colors.fg
-	vim.g.terminal_color_8 = colors.comment
-	vim.g.terminal_color_9 = colors.red
-	vim.g.terminal_color_10 = colors.green
-	vim.g.terminal_color_11 = colors.yellow
-	vim.g.terminal_color_12 = colors.blue
-	vim.g.terminal_color_13 = colors.purple
-	vim.g.terminal_color_14 = colors.blue
-	vim.g.terminal_color_15 = colors.fg
-end
-
-return M
-
+return theme
