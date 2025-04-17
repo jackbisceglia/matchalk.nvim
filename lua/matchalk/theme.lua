@@ -1,41 +1,41 @@
--- theme.lua
--- matchalk neovim colorscheme
+-- ~/.config/nvim/lua/theme.lua
+-- matchalk for Neovim (alpha removed)
 
-local theme = {}
+local M = {}
 
--- palette
-theme.colors = {
-	bg = "#273136",
-	fg = "#D1DED3",
-	red = "#ff819f",
-	green = "#7eb08a",
-	yellow = "#d2b48c",
-	blue = "#7ea4b0",
-	magenta = "#ba8eaf",
-	cyan = "#7ea4b0",
-	comment = "#7ea4b0",
-	gutter_fg = "#D1DED350",
-	sel_bg = "#7eb08a30",
-	menu_bg = "#323e45",
-}
+M.setup = function()
+	-- enable true color
+	vim.opt.termguicolors = true
 
--- helper
-local hl = vim.api.nvim_set_hl
-
-function theme.setup()
+	-- clear existing highlights
 	vim.cmd("highlight clear")
 	if vim.fn.exists("syntax_on") == 1 then
 		vim.cmd("syntax reset")
 	end
+
 	vim.g.colors_name = "matchalk"
 
-	local c = theme.colors
+	local c = {
+		bg = "#273136",
+		fg = "#D1DED3",
+		red = "#ff819f",
+		green = "#7eb08a",
+		yellow = "#d2b48c",
+		blue = "#7ea4b0",
+		magenta = "#ba8eaf",
+		cyan = "#7ea4b0",
+		comment = "#7ea4b0",
+		gutter_fg = "#D1DED3", -- was "#D1DED350"
+		sel_bg = "#7eb08a", -- was "#7eb08a30"
+		menu_bg = "#323e45",
+	}
 
-	-- core UI
+	local hl = vim.api.nvim_set_hl
+
+	-- basic UI
 	hl(0, "Normal", { fg = c.fg, bg = c.bg })
 	hl(0, "CursorLine", { bg = c.menu_bg })
 	hl(0, "CursorLineNr", { fg = c.yellow, bg = c.menu_bg, bold = true })
-
 	hl(0, "LineNr", { fg = c.gutter_fg, bg = c.bg })
 	hl(0, "Visual", { bg = c.sel_bg })
 	hl(0, "Search", { fg = c.bg, bg = c.yellow })
@@ -51,7 +51,7 @@ function theme.setup()
 	hl(0, "TabLineFill", { fg = c.fg, bg = "#1c2427" })
 	hl(0, "VertSplit", { fg = c.bg })
 
-	-- syntax
+	-- syntax groups
 	hl(0, "Comment", { fg = c.comment, italic = true })
 	hl(0, "Constant", { fg = c.yellow })
 	hl(0, "String", { fg = c.magenta })
@@ -82,16 +82,16 @@ function theme.setup()
 	hl(0, "Delimiter", { fg = c.blue })
 	hl(0, "Underlined", { fg = c.yellow, underline = true })
 	hl(0, "Ignore", { fg = c.bg })
-	hl(0, "Error", { fg = c.red, bg = c.bg })
+	hl(0, "Error", { fg = c.red })
 	hl(0, "Todo", { fg = c.bg, bg = c.yellow })
 
-	-- diagnostics (Neovim 0.6+)
+	-- diagnostic (0.6+)
 	hl(0, "DiagnosticError", { fg = c.red })
 	hl(0, "DiagnosticWarn", { fg = c.yellow })
 	hl(0, "DiagnosticInfo", { fg = c.yellow })
 	hl(0, "DiagnosticHint", { fg = c.green })
 
-	-- treesitter (optional)
+	-- treesitter
 	hl(0, "@comment", { fg = c.comment, italic = true })
 	hl(0, "@constant", { fg = c.yellow })
 	hl(0, "@string", { fg = c.magenta })
@@ -107,4 +107,4 @@ function theme.setup()
 	hl(0, "@punctuation", { fg = c.blue })
 end
 
-return theme
+return M
