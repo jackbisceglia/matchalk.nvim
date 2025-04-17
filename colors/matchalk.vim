@@ -1,4 +1,3 @@
-if exists('g:colors_name')
-  finish
-endif
+if exists('g:colors_name') | finish | endif
 lua require('matchalk').setup()
+

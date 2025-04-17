@@ -1,5 +1,5 @@
 -- lua/matchalk/init.lua
--- 1:1 VSCode→Neovim port of matchalk.json, alpha intact via blend.
+-- 1:1 port of matchalk.json, zero build, proper fg/bg handling
 
 local M = {}
 
@@ -16,27 +16,28 @@ local function parse_color(col)
 	return { hex = hex, blend = blend }
 end
 
--- map some common VSCode color keys → Neovim highlight groups
--- extend this to cover all the UI pieces you need
-local ui_map = {
-	["editor.background"] = "Normal",
-	["editor.foreground"] = "Normal",
-	["editor.selectionBackground"] = "Visual",
-	["editor.lineHighlightBackground"] = "CursorLine",
-	["editor.findMatchBorder"] = "Search",
-	["editor.findMatchHighlightBackground"] = "IncSearch",
-	["editorGutter.addedBackground"] = "DiffAdd",
-	["editorGutter.modifiedBackground"] = "DiffChange",
-	["editorGutter.deletedBackground"] = "DiffDelete",
-	["statusBar.background"] = "StatusLine",
-	["statusBar.foreground"] = "StatusLine",
-	["statusBar.noFolderBackground"] = "StatusLineNC",
-	["sideBar.background"] = "NormalFloat",
-	["editorBracketMatch.background"] = "MatchParen",
-	-- …add more as you go…
+-- for each VSCode color key, which highlight group
+-- to set, and which attribute (fg/bg) to use
+local ui_map_attrs = {
+	["editor.background"] = { group = "Normal", bg = true },
+	["editor.foreground"] = { group = "Normal", fg = true },
+	["editor.selectionBackground"] = { group = "Visual", bg = true },
+	["editor.lineHighlightBackground"] = { group = "CursorLine", bg = true },
+	["editor.findMatchBorder"] = { group = "Search", fg = true },
+	["editor.findMatchHighlightBackground"] = { group = "Search", bg = true },
+	["editorGutter.addedBackground"] = { group = "DiffAdd", bg = true },
+	["editorGutter.modifiedBackground"] = { group = "DiffChange", bg = true },
+	["editorGutter.deletedBackground"] = { group = "DiffDelete", bg = true },
+	["statusBar.background"] = { group = "StatusLine", bg = true },
+	["statusBar.foreground"] = { group = "StatusLine", fg = true },
+	["statusBar.noFolderBackground"] = { group = "StatusLineNC", bg = true },
+	["sideBar.background"] = { group = "NormalFloat", bg = true },
+	["sideBar.foreground"] = { group = "NormalFloat", fg = true },
+	["editorBracketMatch.background"] = { group = "MatchParen", bg = true },
+	-- …add more mappings here as you discover groups you care about…
 }
 
--- map simplistic scope → Treesitter group; extend as needed
+-- a minimal scope→treesitter map; you can expand this too
 local tok_map = {
 	comment = "@comment",
 	string = "@string",
@@ -56,37 +57,40 @@ local function map_scope(scope)
 end
 
 function M.setup()
-	-- enable true color                         .
 	vim.opt.termguicolors = true
 	vim.cmd("highlight clear")
 	if vim.fn.exists("syntax_on") == 1 then
 		vim.cmd("syntax reset")
 	end
-
-	-- mark ourselves loaded
 	vim.g.colors_name = "matchalk"
 
-	-- locate matchalk.json in this plugin’s folder
+	-- locate our bundled JSON
 	local src = debug.getinfo(1, "S").source:sub(2)
-	local plugin_root = src:match("(.*)/lua/matchalk/init.lua$")
-	local json_path = plugin_root .. "/lua/matchalk/matchalk.json"
-
-	-- read & decode
-	local data = vim.fn.readfile(json_path)
-	local raw = vim.fn.json_decode(table.concat(data, "\n"))
+	local root = src:match("(.*)/lua/matchalk/init.lua$")
+	local json = table.concat(vim.fn.readfile(root .. "/lua/matchalk/matchalk.json"), "\n")
+	local raw = vim.fn.json_decode(json)
 
 	local set_hl = vim.api.nvim_set_hl
 
-	-- 1) UI colors
+	-- 1) UI colours
 	for key, col in pairs(raw.colors) do
-		local group = ui_map[key]
-		if group then
+		local m = ui_map_attrs[key]
+		if m then
 			local p = parse_color(col)
-			set_hl(0, group, {
-				fg = p.hex,
-				bg = p.hex,
-				blend = p.blend,
-			})
+			local args = {}
+			if m.fg then
+				args.fg = p.hex
+				if p.blend then
+					args.blend = p.blend
+				end
+			end
+			if m.bg then
+				args.bg = p.hex
+				if p.blend then
+					args.blend = p.blend
+				end
+			end
+			set_hl(0, m.group, args)
 		end
 	end
 
